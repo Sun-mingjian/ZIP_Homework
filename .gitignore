@@ -135,6 +135,8 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+.gradle/
+.idea/
 
 # Translations
 *.mo
