@@ -40,7 +40,7 @@ public class UserController {
 
     @PostMapping("/user")
     public ResponseEntity<UserDetails> createUser(@Valid @RequestBody UserDetails userDetails) {
-        userService.validateUserEmail(userDetails.getEmail());
+        userService.validateIfEmailExists(userDetails.getEmail());
         log.debug("Create user with email : " + userDetails.getEmail());
         UserDetails user = userService.createNewUser(userDetails);
         return new ResponseEntity<>(user, HttpStatus.CREATED);

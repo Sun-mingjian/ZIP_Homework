@@ -13,7 +13,7 @@ public class UserAdaptor {
                 .userId(user.getId())
                 .userName(user.getName())
                 .email(user.getEmail())
-                .monthlyExpense(user.getMonthlyExpenses())
+                .monthlyExpense(user.getMonthlyExpense())
                 .monthlySalary(user.getMonthlySalary())
                 .accounts(
                         user.getAccountList().stream().map(AccountAdaptor::adaptToAccountDetails).collect(Collectors.toList()))
@@ -22,6 +22,6 @@ public class UserAdaptor {
 
     public static User adaptToUserEntity(UserDetails userDetails) {
         return User.builder().name(userDetails.getUserName()).email(userDetails.getEmail())
-                .monthlyExpenses(userDetails.getMonthlyExpense()).monthlySalary(userDetails.getMonthlySalary()).build();
+                .monthlyExpense(userDetails.getMonthlyExpense()).monthlySalary(userDetails.getMonthlySalary()).build();
     }
 }

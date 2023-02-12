@@ -4,6 +4,7 @@ plugins {
 	id 'java'
 	id 'maven-publish'
 	id 'distribution'
+	id 'pmd'
 }
 
 group = 'co.zip.candidate'
@@ -12,6 +13,13 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+}
+
+pmd {
+	consoleOutput = true
+	toolVersion = "6.21.0"
+	rulesMinimumPriority = 5
+	ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
 }
 
 dependencies {

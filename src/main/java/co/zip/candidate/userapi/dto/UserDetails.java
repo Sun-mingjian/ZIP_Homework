@@ -25,7 +25,7 @@ public class UserDetails implements Serializable {
 
     @JsonProperty("email")
     @NotBlank(message = "email is required and must not be blank")
-    @Email(message = "The email address is invalid.")
+    @Email(message = "The email address is invalid")
     private String email;
 
     @JsonProperty("monthly_salary")

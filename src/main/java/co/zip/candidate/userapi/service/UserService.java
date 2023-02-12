@@ -34,7 +34,7 @@ public class UserService {
         return users.stream().map(UserAdaptor::adaptToUserDetails).collect(Collectors.toList());
     }
 
-    public void validateUserEmail(String email) {
+    public void validateIfEmailExists(String email) {
         userRepository.findByEmail(email).ifPresent(user -> {
             throw new UserEmailExistingException(String.format("Sorry, this email has been associated with user: %s", user.getName()));
         });

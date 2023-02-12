@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -39,7 +39,7 @@ public class User {
     BigDecimal monthlySalary;
 
     @Column(name = "monthly_expense", precision = 9, scale = 2, nullable = false)
-    BigDecimal monthlyExpenses;
+    BigDecimal monthlyExpense;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     @Builder.Default
