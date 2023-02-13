@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Builder
 @Data
@@ -42,7 +41,7 @@ public class UserDetails implements Serializable {
     @Positive(message = "monthly_expense must be greater than 0")
     private BigDecimal monthlyExpense;
 
-    @JsonProperty("accounts")
-    List<AccountDetails> accounts;
+    @JsonProperty("account")
+    private AccountDetails account;
 
 }

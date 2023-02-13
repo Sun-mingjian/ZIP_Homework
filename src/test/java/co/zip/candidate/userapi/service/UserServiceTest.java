@@ -1,9 +1,16 @@
 package co.zip.candidate.userapi.service;
 
+import co.zip.candidate.userapi.dto.AccountDetails;
 import co.zip.candidate.userapi.dto.UserDetails;
+import co.zip.candidate.userapi.entity.Account;
 import co.zip.candidate.userapi.entity.User;
+import co.zip.candidate.userapi.enums.AccountType;
+import co.zip.candidate.userapi.exception.InsufficientCreditException;
+import co.zip.candidate.userapi.exception.InvalidAccountTypeException;
+import co.zip.candidate.userapi.exception.UserAccountExistingException;
 import co.zip.candidate.userapi.exception.UserEmailExistingException;
 import co.zip.candidate.userapi.exception.UserNotFoundException;
+import co.zip.candidate.userapi.repository.AccountRepository;
 import co.zip.candidate.userapi.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +40,9 @@ public class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+
+    @Mock
+    AccountRepository accountRepository;
 
     @InjectMocks
     UserService userService;
@@ -129,6 +141,107 @@ public class UserServiceTest {
         assertEquals(result.getEmail(), testEmail);
         assertEquals(result.getMonthlySalary(), monthlySalary);
         assertEquals(result.getMonthlyExpense(), monthlyExpense);
+    }
+
+    @Test
+    @DisplayName("Create new user account works as expected")
+    public void testCreateNewUserAccount() {
+        String testName = "Michael";
+        String testEmail = "Michael@gmail.com";
+        Long testUserId = 3L;
+        String accountType = "ZIP PAY";
+        BigDecimal monthlySalary = BigDecimal.valueOf(100000);
+        BigDecimal monthlyExpense = BigDecimal.valueOf(20000);
+        User testUser = User.builder().name(testName).email(testEmail).monthlySalary(monthlySalary).monthlyExpense(monthlyExpense).build();
+        UserDetails testUserDetails = UserDetails.builder().userName(testName).email(testEmail).monthlySalary(monthlySalary).monthlyExpense(monthlyExpense).build();
+        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
+        userService.createNewUserAccount(testUserId, accountType);
+        verify(accountRepository).saveAndFlush(any());
+    }
+
+    @Test
+    @DisplayName("Create new user account will raise exception when user is not existing")
+    public void testCreateNewUserAccountWithNoneExistingUser() {
+        String testName = "Michael";
+        String testEmail = "Michael@gmail.com";
+        Long testUserId = 3L;
+        String accountType = "ZIP PAY";
+        BigDecimal monthlySalary = BigDecimal.valueOf(100000);
+        BigDecimal monthlyExpense = BigDecimal.valueOf(20000);
+        when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.createNewUserAccount(testUserId, accountType));
+    }
+
+    @Test
+    @DisplayName("Validate if user can create new account works as expected")
+    public void testValidateIfUserCanCreateNewAccount() {
+        String testName = "Michael";
+        String testEmail = "Michael@gmail.com";
+        Long testUserId = 3L;
+        BigDecimal monthlySalary = BigDecimal.valueOf(100000);
+        BigDecimal monthlyExpense = BigDecimal.valueOf(20000);
+        User testUser = User.builder().name(testName).email(testEmail).monthlySalary(monthlySalary).monthlyExpense(monthlyExpense).build();
+        AccountDetails accountDetails = AccountDetails.builder().accountType(AccountType.ZIP_MONEY.description).build();
+        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
+        assertDoesNotThrow(() -> userService.validateIfUserCanCreateNewAccount(testUserId, accountDetails));
+    }
+
+    @Test
+    @DisplayName("Validate if user can create new account works will raise exception when user is not exiting")
+    public void testValidateIfUserCanCreateNewAccountWithNoneExistingUser() {
+        String testName = "Michael";
+        String testEmail = "Michael@gmail.com";
+        Long testUserId = 3L;
+        BigDecimal monthlySalary = BigDecimal.valueOf(100000);
+        BigDecimal monthlyExpense = BigDecimal.valueOf(20000);
+        User testUser = User.builder().name(testName).email(testEmail).monthlySalary(monthlySalary).monthlyExpense(monthlyExpense).build();
+        AccountDetails accountDetails = AccountDetails.builder().accountType(AccountType.ZIP_MONEY.description).build();
+        when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> userService.validateIfUserCanCreateNewAccount(testUserId, accountDetails));
+    }
+
+    @Test
+    @DisplayName("Validate if user can create new account works will raise exception when account type is invalid")
+    public void testValidateIfUserCanCreateNewAccountWithInvalidAccountType() {
+        String testName = "Michael";
+        String testEmail = "Michael@gmail.com";
+        Long testUserId = 3L;
+        BigDecimal monthlySalary = BigDecimal.valueOf(100000);
+        BigDecimal monthlyExpense = BigDecimal.valueOf(20000);
+        User testUser = User.builder().name(testName).email(testEmail).monthlySalary(monthlySalary).monthlyExpense(monthlyExpense).build();
+        AccountDetails accountDetails = AccountDetails.builder().accountType("invalidAccountType").build();
+        assertThrows(InvalidAccountTypeException.class, () -> userService.validateIfUserCanCreateNewAccount(testUserId, accountDetails));
+    }
+
+    @Test
+    @DisplayName("Validate if user can create new account works will raise exception when an existing account linked")
+    public void testValidateIfUserCanCreateNewAccountWithExistingAccount() {
+        String testName = "Michael";
+        String testEmail = "Michael@gmail.com";
+        String accountType = "ZIP PAY";
+        Long testUserId = 3L;
+        BigDecimal monthlySalary = BigDecimal.valueOf(100000);
+        BigDecimal monthlyExpense = BigDecimal.valueOf(20000);
+        User testUser = User.builder().name(testName).email(testEmail).monthlySalary(monthlySalary).monthlyExpense(monthlyExpense)
+                .account(Account.builder().build()).build();
+        AccountDetails accountDetails = AccountDetails.builder().accountType(accountType).build();
+        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
+        assertThrows(UserAccountExistingException.class, () -> userService.validateIfUserCanCreateNewAccount(testUserId, accountDetails));
+    }
+
+    @Test
+    @DisplayName("Validate if user can create new account works will raise exception when there is no sufficient credit")
+    public void testValidateIfUserCanCreateNewAccountWithoutSufficientCredit() {
+        String testName = "Michael";
+        String testEmail = "Michael@gmail.com";
+        String accountType = "ZIP PAY";
+        Long testUserId = 3L;
+        BigDecimal monthlySalary = BigDecimal.valueOf(1000);
+        BigDecimal monthlyExpense = BigDecimal.valueOf(10);
+        User testUser = User.builder().name(testName).email(testEmail).monthlySalary(monthlySalary).monthlyExpense(monthlyExpense).build();
+        AccountDetails accountDetails = AccountDetails.builder().accountType(accountType).build();
+        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
+        assertThrows(InsufficientCreditException.class, () -> userService.validateIfUserCanCreateNewAccount(testUserId, accountDetails));
     }
 
 }

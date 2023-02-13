@@ -4,8 +4,6 @@ package co.zip.candidate.userapi.service;
 import co.zip.candidate.userapi.dto.UserDetails;
 import co.zip.candidate.userapi.entity.User;
 
-import java.util.stream.Collectors;
-
 public class UserAdaptor {
 
     public static UserDetails adaptToUserDetails(User user) {
@@ -15,8 +13,7 @@ public class UserAdaptor {
                 .email(user.getEmail())
                 .monthlyExpense(user.getMonthlyExpense())
                 .monthlySalary(user.getMonthlySalary())
-                .accounts(
-                        user.getAccountList().stream().map(AccountAdaptor::adaptToAccountDetails).collect(Collectors.toList()))
+                .account(AccountAdaptor.adaptToAccountDetails(user.getAccount()))
                 .build();
     }
 

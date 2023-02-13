@@ -1,5 +1,6 @@
 package co.zip.candidate.userapi.controller;
 
+import co.zip.candidate.userapi.dto.AccountDetails;
 import co.zip.candidate.userapi.dto.UserDetails;
 import co.zip.candidate.userapi.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,8 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<UserDetails> getUserById(@PathVariable(value = "id") String userId) {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<UserDetails> getUserById(@PathVariable(value = "userId") String userId) {
         log.debug("Fetching user details with id : {} ", userId);
         UserDetails user = userService.getUser(Long.parseLong(userId));
         return ResponseEntity.ok().body(user);
@@ -44,5 +45,15 @@ public class UserController {
         log.debug("Create user with email : {}", userDetails.getEmail());
         UserDetails user = userService.createNewUser(userDetails);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/user/{userId}/account")
+    public ResponseEntity<Void> createUserAccount(@PathVariable(value = "userId") String id,
+                                                  @Valid @RequestBody AccountDetails accountDetails) {
+        Long userId = Long.parseLong(id);
+        userService.validateIfUserCanCreateNewAccount(userId, accountDetails);
+        log.debug("Create user {} account with account type : {}", userId, accountDetails.getAccountType());
+        userService.createNewUserAccount(userId, accountDetails.getAccountType());
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 }

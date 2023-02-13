@@ -31,6 +31,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidAccountTypeException.class)
+    public ResponseEntity<?> InvalidAccountTypeExceptionHandler(InvalidAccountTypeException ex, WebRequest request) {
+        ErrorMessage errorMessage = ErrorMessage.builder().description(ex.getMessage()).build();
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserAccountExistingException.class)
+    public ResponseEntity<?> UserAccountExistingExceptionHandler(UserAccountExistingException ex, WebRequest request) {
+        ErrorMessage errorMessage = ErrorMessage.builder().description(ex.getMessage()).build();
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InsufficientCreditException.class)
+    public ResponseEntity<?> InsufficientCreditExceptionHandler(InsufficientCreditException ex, WebRequest request) {
+        ErrorMessage errorMessage = ErrorMessage.builder().description(ex.getMessage()).build();
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
                                                                   HttpStatus status, WebRequest request) {

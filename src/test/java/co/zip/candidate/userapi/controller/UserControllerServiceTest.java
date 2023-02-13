@@ -1,7 +1,9 @@
 package co.zip.candidate.userapi.controller;
 
+import co.zip.candidate.userapi.dto.AccountDetails;
 import co.zip.candidate.userapi.dto.ErrorMessage;
 import co.zip.candidate.userapi.dto.UserDetails;
+import co.zip.candidate.userapi.enums.AccountType;
 import co.zip.candidate.userapi.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -232,4 +235,54 @@ public class UserControllerServiceTest {
         assertTrue(errors.contains(invalidMonthlyExpenseErrorMsg));
     }
 
+    @Test
+    @DisplayName("Create new user account would return 400 when account type is invalid")
+    public void testCreateNewUserAccountWithInvalidAccountType() {
+        String testUserId = "1";
+        AccountDetails accountDetails = AccountDetails.builder().accountType("invalidAccountType").build();
+        ResponseEntity<ErrorMessage> response = restTemplate.
+                postForEntity(URL + port + "/api/user/" + testUserId + "/account", accountDetails, ErrorMessage.class);
+        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+
+        ErrorMessage errorMessage = response.getBody();
+        assertTrue(errorMessage.getDescription().contains("Sorry, this account type is invalid"));
+    }
+
+    @Test
+    @DisplayName("Create new user account would return 404 when user is not found")
+    public void testCreateNewUserAccountWithNoneExistingUser() {
+        String testUserId = "8";
+        AccountDetails accountDetails = AccountDetails.builder().accountType("ZIP PAY").build();
+        ResponseEntity<ErrorMessage> response = restTemplate.
+                postForEntity(URL + port + "/api/user/" + testUserId + "/account", accountDetails, ErrorMessage.class);
+        assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("Create new user account would return 400 with insufficient fund")
+    public void testCreateNewUserAccountWithInsufficientFund() {
+        String testUserId = "3";
+        AccountDetails accountDetails = AccountDetails.builder().accountType("ZIP PAY").build();
+        ResponseEntity<ErrorMessage> response = restTemplate.
+                postForEntity(URL + port + "/api/user/" + testUserId + "/account", accountDetails, ErrorMessage.class);
+        ErrorMessage errorMessage = response.getBody();
+        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        assertTrue(errorMessage.getDescription().contains("Sorry, this user does not have the sufficient credit of $1000"));
+    }
+
+    @Test
+    @DisplayName("Create new user account would return 201 as expected")
+    public void testCreateNewUserAccount() {
+        String testUserId = "1";
+        AccountDetails accountDetails = AccountDetails.builder().accountType("ZIP PAY").build();
+        ResponseEntity<Void> response = restTemplate.
+                postForEntity(URL + port + "/api/user/" + testUserId + "/account", accountDetails, Void.class);
+        assertEquals(response.getStatusCode(), HttpStatus.CREATED);
+
+        ResponseEntity<UserDetails> newResponse = restTemplate.
+                getForEntity(URL + port + "/api/user/" + testUserId, UserDetails.class);
+        UserDetails result = newResponse.getBody();
+        assertNotNull(result.getAccount());
+        assertEquals(result.getAccount().getAccountType(), AccountType.ZIP_PAY.description);
+    }
 }
