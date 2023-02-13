@@ -26,7 +26,7 @@ public class UserController {
 
     @GetMapping("/user/{id}")
     public ResponseEntity<UserDetails> getUserById(@PathVariable(value = "id") String userId) {
-        log.debug("Fetching user details with id : " + userId);
+        log.debug("Fetching user details with id : {} ", userId);
         UserDetails user = userService.getUser(Long.parseLong(userId));
         return ResponseEntity.ok().body(user);
     }
@@ -41,7 +41,7 @@ public class UserController {
     @PostMapping("/user")
     public ResponseEntity<UserDetails> createUser(@Valid @RequestBody UserDetails userDetails) {
         userService.validateIfEmailExists(userDetails.getEmail());
-        log.debug("Create user with email : " + userDetails.getEmail());
+        log.debug("Create user with email : {}", userDetails.getEmail());
         UserDetails user = userService.createNewUser(userDetails);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
@@ -13,7 +14,10 @@ import java.time.OffsetDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountDetails {
+public class AccountDetails implements Serializable {
+
+    static final long serialVersionUID = 43L;
+
     @JsonProperty("account_number")
     String accountNumber;
     @JsonProperty("balance")

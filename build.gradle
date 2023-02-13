@@ -16,6 +16,7 @@ repositories {
 }
 
 pmd {
+	sourceSets = [ project.sourceSets.main ]
 	consoleOutput = true
 	toolVersion = "6.21.0"
 	rulesMinimumPriority = 5

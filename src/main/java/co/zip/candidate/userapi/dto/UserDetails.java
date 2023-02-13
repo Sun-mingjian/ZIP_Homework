@@ -16,6 +16,8 @@ import java.util.List;
 @Builder
 @Data
 public class UserDetails implements Serializable {
+    static final long serialVersionUID = 42L;
+
     @JsonProperty("userid")
     private Long userId;
 
