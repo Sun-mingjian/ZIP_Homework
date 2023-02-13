@@ -29,7 +29,7 @@ import java.time.OffsetDateTime;
 @Data
 public class Account {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
     @Column(name = "account_type", nullable = false)
