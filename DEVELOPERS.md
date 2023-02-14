@@ -16,9 +16,10 @@
 
 ## Testing
 
-1. For functional unit testing, we use junit5 and mockito, please check `UserServiceTest.java` file.
-2. For functional integration testing, we use springboot test powered by spring framework, please
-   check `UserControllerTest.java` file.
+1. For functional unit testing, we use `junit5`, `mockito` and `h2` embedded database, please
+   check `UserServiceTest.java` file, and pre-populate test data in `src\test\resources\data.sql`.
+2. For functional integration testing, we use and `h2` embedded database and `springboot test` powered by spring
+   framework, please check `UserControllerTest.java` file, and pre-populate test data in `src\test\resources\data.sql`.
 3. For api testing, please try to use postman as the api client, and hit url like :
     1. ``GET http://localhost:8080/api/user/1``
     2. ``GET http://localhost:8080/api/users``
@@ -46,8 +47,14 @@
 1. Deployments are managed via Jenkins. `Master` is automatically deployed to staging `staging.api.zip.user.com`,
    while `Release` is auto-deployed to production `api.zip.user.com`.
 2. Any changes around database will be handled by liquibase script, please create liquibase script
-   under `resource\db\{version}`folder(Under Construction), they would be auto deployed through the app deployment
+   under `resource\db\{version}` folder(Under Construction), they would be auto deployed through the app deployment
    process.
 
 ## Additional Information
+
+1. Future work includes adding `findbugs` and `checkstyle` as well as `sonarqube` plugins to ensure standard coding
+   style and quality.
+2. Introduce `OpenAPI` or `Swagger` as the api design collaboration, documentation and publishing tools.
+3. Thanks all the maintainers for all your contribution, you all deserve a cup of coffee :coffee: :smile:.
+
 Please reach out to Michael(`michael.sun.career@gmail.com`) for any issues.
